@@ -3,21 +3,12 @@
 
 #include "Helpers.h"
 
-#include <Windows.h>
-
-#ifdef UNICODE
-#define _UNICODE
-#endif
-
-#include <mmreg.h>
-#include <MSAcm.h>
-
 namespace WaveSabreCore
 {
 	class GsmSample
 	{
 	public:
-		GsmSample(char *data, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormat);
+		GsmSample(char *data, int compressedSize, int uncompressedSize, void *waveFormat);
 		~GsmSample();
 
 		char *WaveFormatData;
@@ -29,10 +20,10 @@ namespace WaveSabreCore
 		int SampleLength;
 
 	private:
-		static BOOL __stdcall driverEnumCallback(HACMDRIVERID driverId, DWORD_PTR dwInstance, DWORD fdwSupport);
-		static BOOL __stdcall formatEnumCallback(HACMDRIVERID driverId, LPACMFORMATDETAILS formatDetails, DWORD_PTR dwInstance, DWORD fdwSupport);
+		static bool driverEnumCallback(void *driverId, unsigned long dwInstance, unsigned long fdwSupport);
+		static bool formatEnumCallback(void *driverId, void *formatDetails, unsigned long dwInstance, unsigned long fdwSupport);
 
-		static HACMDRIVERID driverId;
+		static void *driverId;
 	};
 }
 

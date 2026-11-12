@@ -23,6 +23,8 @@ namespace WaveSabreCore
 		float GetValue() const;
 		void Next();
 
+		void SetSampleRate(float sampleRate) { this->sampleRate = sampleRate; }
+
 		EnvelopeState State;
 
 		float Attack, Decay, Sustain, Release;
@@ -30,6 +32,7 @@ namespace WaveSabreCore
 	private:
 		float pos;
 		float releaseValue;
+		float sampleRate = 44100.0f;
 	};
 }
 

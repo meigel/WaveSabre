@@ -24,11 +24,16 @@ namespace WaveSabreCore
 		virtual void SetChunk(void *data, int size);
 		virtual int GetChunk(void **data);
 
+		float GetSampleRate() const { return sampleRate; }
+		int GetTempo() const { return tempo; }
+
 	protected:
 		virtual void clearOutputs(float **outputs, int numSamples);
 
 		int numParams;
 		void *chunkData;
+		float sampleRate;
+		int tempo;
 	};
 }
 

@@ -1,6 +1,6 @@
 #include <WaveSabrePlayerLib/WavWriter.h>
 
-#include <Windows.h>
+#define WAVE_FORMAT_PCM 1
 
 namespace WaveSabrePlayerLib
 {

@@ -63,7 +63,7 @@ namespace WaveSabreCore
 		virtual void SetChunk(void *data, int size);
 		virtual int GetChunk(void **data);
 
-		void LoadSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr);
+		void LoadSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, void *waveFormatPtr);
 
 	private:
 		class SpecimenVoice : public Voice

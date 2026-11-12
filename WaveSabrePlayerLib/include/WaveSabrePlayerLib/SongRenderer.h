@@ -89,7 +89,7 @@ namespace WaveSabrePlayerLib
 
 			Track(SongRenderer *songRenderer, DeviceFactory factory);
 			~Track();
-			
+
 			void Run(int numSamples);
 
 		private:
@@ -150,17 +150,8 @@ namespace WaveSabrePlayerLib
 			Finished,
 		};
 
-		typedef struct
-		{
-			SongRenderer *songRenderer;
-			int renderThreadIndex;
-		} RenderThreadData;
-
-		static DWORD WINAPI renderThreadProc(LPVOID lpParameter);
-
 		bool renderThreadWork(int renderThreadIndex);
 
-		// TODO: Templatize? Might actually be bigger..
 		unsigned char readByte();
 		int readInt();
 		float readFloat();
@@ -172,7 +163,7 @@ namespace WaveSabrePlayerLib
 		int bpm;
 		int sampleRate;
 		double length;
-	
+
 		int numDevices;
 		WaveSabreCore::Device **devices;
 
@@ -184,13 +175,10 @@ namespace WaveSabrePlayerLib
 		TrackRenderState *trackRenderStates;
 
 		int numRenderThreads;
-		HANDLE *additionalRenderThreads;
 
 		bool renderThreadShutdown;
 		int renderThreadNumFloatSamples;
 		unsigned int renderThreadsRunning;
-		HANDLE *renderThreadStartEvents;
-		HANDLE renderDoneEvent;
 	};
 }
 

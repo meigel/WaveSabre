@@ -1,65 +1,93 @@
-project("WaveSabre" LANGUAGES C CXX CSharp)
-
-# Enable C# Utilities also for the VS2013 AppVeyor stage.
-cmake_policy(SET CMP0057 NEW)
-include(CSharpUtilities)
-set(CMAKE_CSharp_FLAGS ${CMAKE_CSharp_FLAGS} "/langversion:6")
-
 cmake_minimum_required(VERSION 3.11)
+project("WaveSabre" LANGUAGES C CXX)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(MSVC)
-	# disable exceptions globally (will be added back for VSTs)
 	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 endif()
 
-set(BUILD_VST_PLUGINS ON CACHE BOOL "Opt out of building the VST plugins.")
-set(BUILD_WAVESABRE_CONVERT ON CACHE BOOL "Do not build WaveSabreConvert.")
-set(BUILD_WAVESABRE_CONVERT_TESTS ON CACHE BOOL "Do not build the WaveSabreConvert tests.")
-set(BUILD_CONVERT_THE_FUCK ON CACHE BOOL "Do not build ConvertTheFuck.")
-set(BUILD_PROJECT_MANAGER ON CACHE BOOL "Do not build the project manager.")
+option(WAVESABRE_BUILD_CORE "Build WaveSabre DSP core" ON)
+option(WAVESABRE_BUILD_PLAYERLIB "Build WaveSabre player library" ON)
+option(WAVESABRE_BUILD_HEADLESS "Build headless renderer and tools" ON)
+option(WAVESABRE_BUILD_IR "Build WaveSabre IR library" ON)
+option(WAVESABRE_BUILD_DAWPROJECT "Build DAWproject importer" ON)
+option(WAVESABRE_BUILD_CLAP "Build CLAP plugin" ON)
+
+option(WAVESABRE_BUILD_WIN32_AUDIO "Build DirectSound/WinMM realtime audio backend" OFF)
+option(WAVESABRE_BUILD_LEGACY_VST2 "Build legacy VST2 plugins" OFF)
+option(WAVESABRE_BUILD_DOTNET_TOOLS "Build legacy C# tools" OFF)
+option(WAVESABRE_BUILD_PROJECT_MANAGER "Build WinForms ProjectManager" OFF)
+option(WAVESABRE_ENABLE_GSM_ACM "Enable Windows ACM GSM sample decoding" OFF)
+
 set(VSTSDK3_DIR "${PROJECT_SOURCE_DIR}/Vst3.x/" CACHE PATH "VSTSDK location")
 
-# Download and unpack VST3 SDK
-set(DOWNLOAD_VST3SDK OFF CACHE BOOL "Download and unpack VST3 SDK automatically.")
-if(${BUILD_VST_PLUGINS} AND ${DOWNLOAD_VST3SDK})
-	find_file(VST3SDK_TEST name public.sdk HINTS ${VSTSDK3_DIR})
-	if(${VST3SDK_TEST} MATCHES VST3SDK_TEST-NOTFOUND)
-		message(STATUS "VST3 SDK not found. Will download.")
-		file(DOWNLOAD https://web.archive.org/web/20200502121517/https://www.steinberg.net/sdk_downloads/vstsdk366_27_06_2016_build_61.zip vstsdk366_27_06_2016_build_61.zip SHOW_PROGRESS)
-		file(ARCHIVE_EXTRACT INPUT vstsdk366_27_06_2016_build_61.zip DESTINATION vstsdk366_27_06_2016_build_61 VERBOSE)
-		file(GLOB VST3SDK_FILES "${CMAKE_CURRENT_BINARY_DIR}/vstsdk366_27_06_2016_build_61/VST3\ SDK/*")
-		file(COPY ${VST3SDK_FILES} DESTINATION ${VSTSDK3_DIR})
+if(WAVESABRE_BUILD_DOTNET_TOOLS AND NOT WIN32)
+	message(FATAL_ERROR "WAVESABRE_BUILD_DOTNET_TOOLS requires Windows")
+endif()
+
+if(WAVESABRE_BUILD_PROJECT_MANAGER AND NOT WIN32)
+	message(FATAL_ERROR "WAVESABRE_BUILD_PROJECT_MANAGER requires Windows")
+endif()
+
+if(WAVESABRE_BUILD_WIN32_AUDIO AND NOT WIN32)
+	message(FATAL_ERROR "WAVESABRE_BUILD_WIN32_AUDIO requires Windows")
+endif()
+
+if(WAVESABRE_BUILD_LEGACY_VST2 AND NOT WIN32)
+	message(FATAL_ERROR "WAVESABRE_BUILD_LEGACY_VST2 requires Windows")
+endif()
+
+if(WAVESABRE_BUILD_CORE)
+	add_subdirectory(WaveSabreCore)
+endif()
+
+if(WAVESABRE_BUILD_PLAYERLIB)
+	add_subdirectory(WaveSabrePlayerLib)
+endif()
+
+if(WAVESABRE_BUILD_IR AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreIR")
+	add_subdirectory(WaveSabreIR)
+endif()
+
+if(WAVESABRE_BUILD_DAWPROJECT AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreDawProject")
+	add_subdirectory(WaveSabreDawProject)
+endif()
+
+if(WAVESABRE_BUILD_CLAP AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreClap")
+	add_subdirectory(WaveSabreClap)
+endif()
+
+if(WAVESABRE_BUILD_HEADLESS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreHeadless")
+	add_subdirectory(WaveSabreHeadless)
+endif()
+
+if(WAVESABRE_BUILD_CORE)
+	if(WIN32)
+		add_subdirectory(Tests/PlayerTest)
 	endif()
 endif()
 
-# shared code
-add_subdirectory(MSVCRT)
-add_subdirectory(WaveSabreCore)
-add_subdirectory(WaveSabrePlayerLib)
+if(WAVESABRE_BUILD_LEGACY_VST2)
+	set(BUILD_VST_PLUGINS ON)
+endif()
 
-# binaries
-add_subdirectory(Tests/PlayerTest)
-add_subdirectory(WaveSabreStandAlonePlayer)
-
-# VSTs
-if(${BUILD_VST_PLUGINS} AND VSTSDK3_DIR)
+# VST3 plugins
+if(BUILD_VST_PLUGINS AND VSTSDK3_DIR AND WIN32)
 	add_subdirectory(WaveSabreVstLib)
 	add_subdirectory(Vsts)
 endif()
 
-# Project file conversions
-if(${BUILD_WAVESABRE_CONVERT})
+# Legacy C# tools
+if(WAVESABRE_BUILD_DOTNET_TOOLS AND WIN32)
 	add_subdirectory(WaveSabreConvert)
-endif()
-if(${BUILD_WAVESABRE_CONVERT_TESTS})
-	add_subdirectory(Tests/WaveSabreConvertTests)
-endif()
-if(${BUILD_CONVERT_THE_FUCK})
+	if(WAVESABRE_BUILD_CONVERT_TESTS)
+		add_subdirectory(Tests/WaveSabreConvertTests)
+	endif()
 	add_subdirectory(ConvertTheFuck)
 endif()
 
-# Project manager
-if(${BUILD_PROJECT_MANAGER})
+# WinForms project manager
+if(WAVESABRE_BUILD_PROJECT_MANAGER AND WIN32)
 	add_subdirectory(ProjectManager)
 endif()

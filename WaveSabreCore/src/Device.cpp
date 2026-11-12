@@ -7,6 +7,8 @@ namespace WaveSabreCore
 	{
 		this->numParams = numParams;
 		chunkData = nullptr;
+		sampleRate = 44100.0f;
+		tempo = 120;
 	}
 
 	Device::~Device()
@@ -20,11 +22,13 @@ namespace WaveSabreCore
 
 	void Device::SetSampleRate(float sampleRate)
 	{
+		this->sampleRate = sampleRate;
 		Helpers::CurrentSampleRate = (double)sampleRate;
 	}
 
 	void Device::SetTempo(int tempo)
 	{
+		this->tempo = tempo;
 		Helpers::CurrentTempo = tempo;
 	}
 

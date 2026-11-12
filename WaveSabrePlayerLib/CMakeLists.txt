@@ -1,26 +1,29 @@
 add_library(WaveSabrePlayerLib
-	include/WaveSabrePlayerLib/CriticalSection.h
-	include/WaveSabrePlayerLib/PreRenderPlayer.h
-	include/WaveSabrePlayerLib/WavWriter.h
-	include/WaveSabrePlayerLib/DirectSoundRenderThread.h
-	include/WaveSabrePlayerLib/RealtimePlayer.h
 	include/WaveSabrePlayerLib/IPlayer.h
 	include/WaveSabrePlayerLib/SongRenderer.h
-	src/CriticalSection.cpp
-	src/DirectSoundRenderThread.cpp
+	include/WaveSabrePlayerLib/WavWriter.h
 	src/IPlayer.cpp
-	src/PreRenderPlayer.cpp
-	src/RealtimePlayer.cpp
-	src/SongRenderer.cpp
-	src/SongRenderer.Track.cpp
 	src/WavWriter.cpp)
 
-target_link_libraries(WaveSabrePlayerLib
-	WaveSabreCore
-	winmm.lib
-	dsound.lib)
+if(WIN32)
+	target_sources(WaveSabrePlayerLib PRIVATE
+		src/SongRenderer.cpp
+		src/SongRenderer.Track.cpp
+		src/CriticalSection.cpp
+		src/DirectSoundRenderThread.cpp
+		src/RealtimePlayer.cpp
+		src/PreRenderPlayer.cpp)
+	target_link_libraries(WaveSabrePlayerLib PRIVATE winmm.lib dsound.lib)
+else()
+	target_sources(WaveSabrePlayerLib PRIVATE
+		src/SongRenderer.SingleThread.cpp)
+endif()
+
+target_link_libraries(WaveSabrePlayerLib PRIVATE WaveSabreCore)
 
 target_include_directories(WaveSabrePlayerLib PUBLIC include)
+target_include_directories(WaveSabrePlayerLib SYSTEM PUBLIC
+	${CMAKE_CURRENT_SOURCE_DIR}/../WaveSabreCore/include)
 
 if(MSVC)
 	target_compile_definitions(WaveSabrePlayerLib PRIVATE _CRT_SECURE_NO_WARNINGS)

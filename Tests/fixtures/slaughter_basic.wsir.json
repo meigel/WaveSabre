@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "sampleRate": 44100,
+  "tempo": {
+    "bpm": 128.0
+  },
+  "tracks": [
+    {
+      "name": "Lead",
+      "device": {
+        "type": "Slaughter",
+        "parameters": {
+          "Osc1Waveform": 1.0,
+          "Osc1Volume": 0.7,
+          "FilterFreq": 8000.0,
+          "MasterLevel": 0.8
+        }
+      },
+      "notes": [
+        {
+          "timeSamples": 0,
+          "durationSamples": 22050,
+          "note": 60,
+          "velocity": 1.0
+        },
+        {
+          "timeSamples": 22050,
+          "durationSamples": 22050,
+          "note": 62,
+          "velocity": 1.0
+        },
+        {
+          "timeSamples": 44100,
+          "durationSamples": 22050,
+          "note": 64,
+          "velocity": 1.0
+        }
+      ],
+      "automation": []
+    }
+  ],
+  "markers": []
+}

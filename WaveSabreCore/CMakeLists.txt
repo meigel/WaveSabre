@@ -14,7 +14,6 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Envelope.h
 	include/WaveSabreCore/Falcon.h
 	include/WaveSabreCore/GmDls.h
-	include/WaveSabreCore/GsmSample.h
 	include/WaveSabreCore/Helpers.h
 	include/WaveSabreCore/Leveller.h
 	include/WaveSabreCore/MxcsrFlagGuard.h
@@ -23,12 +22,9 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Scissor.h
 	include/WaveSabreCore/Slaughter.h
 	include/WaveSabreCore/Smasher.h
-	include/WaveSabreCore/Specimen.h
 	include/WaveSabreCore/StateVariableFilter.h
 	include/WaveSabreCore/SynthDevice.h
 	include/WaveSabreCore/Twister.h
-	include/WaveSabreCore/Deprecated/Thunder.h
-	src/Adultery.cpp
 	src/AllPass.cpp
 	src/AllPassDelay.cpp
 	src/BiquadFilter.cpp
@@ -41,8 +37,6 @@ add_library(WaveSabreCore
 	src/Echo.cpp
 	src/Envelope.cpp
 	src/Falcon.cpp
-	src/GmDls.cpp
-	src/GsmSample.cpp
 	src/Helpers.cpp
 	src/Leveller.cpp
 	src/MxcsrFlagGuard.cpp
@@ -51,13 +45,22 @@ add_library(WaveSabreCore
 	src/Scissor.cpp
 	src/Slaughter.cpp
 	src/Smasher.cpp
-	src/Specimen.cpp
 	src/StateVariableFilter.cpp
 	src/SynthDevice.cpp
-	src/Twister.cpp
-	src/Deprecated/Thunder.cpp)
+	src/Twister.cpp)
 
-target_link_libraries(WaveSabreCore Msacm32.lib)
+if(WIN32)
+	target_sources(WaveSabreCore PRIVATE src/GmDls.cpp src/Adultery.cpp src/Specimen.cpp src/Deprecated/Thunder.cpp)
+	target_include_directories(WaveSabreCore PRIVATE include/WaveSabreCore/Deprecated)
+else()
+	target_sources(WaveSabreCore PRIVATE src/GmDlsStub.cpp src/Adultery.cpp)
+endif()
+
+if(WIN32 AND WAVESABRE_ENABLE_GSM_ACM)
+	target_sources(WaveSabreCore PRIVATE src/GsmSample.cpp)
+	target_link_libraries(WaveSabreCore PRIVATE Msacm32.lib)
+endif()
+
 target_include_directories(WaveSabreCore PUBLIC include)
 
 if(MSVC)
