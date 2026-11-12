@@ -46,19 +46,21 @@ if(WAVESABRE_BUILD_PLAYERLIB)
 	add_subdirectory(WaveSabrePlayerLib)
 endif()
 
-if(WAVESABRE_BUILD_IR AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreIR")
+# Optional components: gate on their CMakeLists.txt, not on the directory, so a
+# stale or partially checked-out directory cannot break the configure step.
+if(WAVESABRE_BUILD_IR AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreIR/CMakeLists.txt")
 	add_subdirectory(WaveSabreIR)
 endif()
 
-if(WAVESABRE_BUILD_DAWPROJECT AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreDawProject")
+if(WAVESABRE_BUILD_DAWPROJECT AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreDawProject/CMakeLists.txt")
 	add_subdirectory(WaveSabreDawProject)
 endif()
 
-if(WAVESABRE_BUILD_CLAP AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreClap")
+if(WAVESABRE_BUILD_CLAP AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreClap/CMakeLists.txt")
 	add_subdirectory(WaveSabreClap)
 endif()
 
-if(WAVESABRE_BUILD_HEADLESS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreHeadless")
+if(WAVESABRE_BUILD_HEADLESS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/WaveSabreHeadless/CMakeLists.txt")
 	add_subdirectory(WaveSabreHeadless)
 endif()
 

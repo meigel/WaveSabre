@@ -1,6 +1,7 @@
 #include <OfflineRenderer.h>
 #include <WaveSabreCore/Slaughter.h>
 #include <WaveSabreCore/Falcon.h>
+#include <WaveSabreCore/Helpers.h>
 #include <cmath>
 #include <algorithm>
 #include <cstring>
@@ -39,6 +40,17 @@ namespace WaveSabreHeadless
 	OfflineRenderer::OfflineRenderer()
 		: currentPosition(0.0)
 	{
+		// Helpers keeps static state that the DSP core depends on: the sine lookup
+		// table used by FastSin (the filter cutoff and the oscillators are built on
+		// it) and the noise RNG seed. Without this the table is all zeros, FastSin
+		// returns 0, and the renderer emits silence. Hosts normally trigger this
+		// from plugin/DLL initialisation; a headless tool has to do it explicitly.
+		static bool helpersInitialised = false;
+		if (!helpersInitialised)
+		{
+			WaveSabreCore::Helpers::Init();
+			helpersInitialised = true;
+		}
 	}
 
 	OfflineRenderer::~OfflineRenderer()
